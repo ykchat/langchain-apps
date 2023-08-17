@@ -2,6 +2,7 @@ import gradio as gr
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ChatMessageHistory
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -20,4 +21,14 @@ def chat(message, history):
     return llm(memory.messages).content
 
 if __name__ == '__main__':
-    gr.ChatInterface(chat).launch()
+
+    app_env = os.environ.get("APP_ENV", "production")
+
+    if app_env == "production":
+        username = os.environ["GRADIO_USERNAME"]
+        password = os.environ["GRADIO_PASSWORD"]
+        auth = (username, password)
+    else:
+        auth = None
+
+    gr.ChatInterface(chat).launch(auth=auth)
