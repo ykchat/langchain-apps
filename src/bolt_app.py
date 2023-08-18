@@ -41,7 +41,6 @@ class SlackBot:
 
         say(bot_message)
 
-# アプリを起動します
 if __name__ == "__main__":
 
     bot = SlackBot(app)
