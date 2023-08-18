@@ -33,10 +33,8 @@ class SlackBot:
             text = message["text"]
             if message["user"] == bot_id:
                 chat_history.add_ai_message(text)
-                print(f"ai: {text}")
             else:
                 chat_history.add_user_message(text)
-                print(f"user: {text}")
 
         user_message = event["text"]
         bot_message = self.bot.chat(user_message, chat_history)
