@@ -6,23 +6,27 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-bot = ChatBot()
-bot.add_vectorstore_tools("./src/", glob="**/*.py")
+class GradioBot:
 
-def handle_message(message, history):
+    def __init__(self):
 
-    chat_history = ChatMessageHistory()
-    for user, ai in history:
-        chat_history.add_user_message(user)
-        chat_history.add_ai_message(ai)
+        self.bot = ChatBot()
+        self.bot.add_vectorstore_tools("./src/", glob_pattern="**/*.py")
 
-    bot_message = bot.chat(message, chat_history)
+    def handle_message(self, message, history):
 
-    return bot_message
+        chat_history = ChatMessageHistory()
+        for user, ai in history:
+            chat_history.add_user_message(user)
+            chat_history.add_ai_message(ai)
+
+        bot_message = self.bot.chat(message, chat_history)
+
+        return bot_message
 
 if __name__ == '__main__':
 
-    load_dotenv()
+    bot = GradioBot()
 
     app_env = os.environ.get("APP_ENV", "production")
 
@@ -33,4 +37,4 @@ if __name__ == '__main__':
     else:
         auth = None
 
-    gr.ChatInterface(handle_message).launch(auth=auth)
+    gr.ChatInterface(bot.handle_message).launch(auth=auth)

@@ -6,11 +6,11 @@ from langchain.indexes import VectorstoreIndexCreator
 from langchain.agents import initialize_agent, AgentType
 from langchain.agents.agent_toolkits import VectorStoreInfo, VectorStoreToolkit
 
+langchain.verbose = True
+
 class ChatBot:
 
     def __init__(self):
-
-        langchain.verbose = True
 
         self.llm = ChatOpenAI(
                         model='gpt-3.5-turbo', 
@@ -19,9 +19,9 @@ class ChatBot:
 
         self.tools = []
 
-    def add_vectorstore_tools(self, dir, glob):
+    def add_vectorstore_tools(self, directory_path, glob_pattern):
 
-        loader = DirectoryLoader(dir, glob=glob)
+        loader = DirectoryLoader(directory_path, glob=glob_pattern)
         index = VectorstoreIndexCreator().from_loaders([loader])
 
         info = VectorStoreInfo(

@@ -7,39 +7,46 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-bot = ChatBot()
-bot.add_vectorstore_tools("./src/", glob="**/*.py")
-
-# ボットトークンとソケットモードハンドラーを使ってアプリを初期化します
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
-@app.event("app_mention")
-def handle_mention(event, say):
+class SlackBot:
 
-    history = app.client.conversations_history(
-        channel = event["channel"],
-        limit=3
-    )
+    def __init__(self, app):
 
-    bot_id = app.client.auth_test()["user_id"]
+        self.bot = ChatBot()
+        self.bot.add_vectorstore_tools("./src/", glob_pattern="**/*.py")
 
-    chat_history = ChatMessageHistory()
-    for message in reversed(history["messages"]):
-        text = message["text"]
-        if message["user"] == bot_id:
-            chat_history.add_ai_message(text)
-            print(f"ai: {text}")
-        else:
-            chat_history.add_user_message(text)
-            print(f"user: {text}")
+        self.app = app
+        self.app.event("app_mention")(self.handle_mention)
 
-    user_message = event["text"]
-    bot_message = bot.chat(user_message, chat_history)
+    def handle_mention(self, event, say):
 
-    say(bot_message)
+        history = self.app.client.conversations_history(
+            channel = event["channel"],
+            limit=3
+        )
+
+        bot_id = self.app.client.auth_test()["user_id"]
+
+        chat_history = ChatMessageHistory()
+        for message in reversed(history["messages"]):
+            text = message["text"]
+            if message["user"] == bot_id:
+                chat_history.add_ai_message(text)
+                print(f"ai: {text}")
+            else:
+                chat_history.add_user_message(text)
+                print(f"user: {text}")
+
+        user_message = event["text"]
+        bot_message = self.bot.chat(user_message, chat_history)
+
+        say(bot_message)
 
 # アプリを起動します
 if __name__ == "__main__":
+
+    bot = SlackBot(app)
 
     app_env = os.environ.get("APP_ENV", "production")
 
